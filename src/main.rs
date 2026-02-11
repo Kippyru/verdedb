@@ -1,33 +1,17 @@
-use std::{
-    fs::File,
-    io::{self, Write},
-};
+use distancia::{DistanciaMetrica, comp};
 
-fn main() -> std::io::Result<()> {
-    let mut tecla = String::new();
+mod distancia;
 
-    io::stdin().read_line(&mut tecla).expect("error al leer");
+fn main() {
+    let a = vec![1.0_f32, 2.0, 3.0];
+    let b = vec![4.0_f32, 5.0, 6.0];
 
-    let mut v = Vec::new();
+    let l2 = comp(&a, &b, DistanciaMetrica::L2).unwrap();
+    println!("L2: {}", l2);
 
-    v.push(1);
-    v.push(2);
-    v.push(3);
-    v.push(tecla.trim().parse::<i32>().unwrap());
+    let coseno = comp(&a, &b, DistanciaMetrica::Coseno).unwrap();
+    println!("coseno: {}", coseno);
 
-    let second: &i32 = &v[1];
-    println!("el segundo elemento es: {second}");
-
-    let mut file = File::options()
-        .append(true)
-        .create(true)
-        .open("./src/test.txt")?;
-
-    for i in &v {
-        println!("{i}");
-        write!(&mut file, "{i} ")?;
-    }
-    writeln!(&mut file, " ")?;
-    file.flush()?;
-    Ok(())
+    let escalar = comp(&a, &b, DistanciaMetrica::Escalar).unwrap();
+    println!("Producto escalar: {}", escalar);
 }
