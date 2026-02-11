@@ -1,6 +1,7 @@
 use distancia::{DistanciaMetrica, comp};
 
 mod distancia;
+mod vector;
 
 fn main() {
     let a = vec![1.0_f32, 2.0, 3.0];
