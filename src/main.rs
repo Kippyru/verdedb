@@ -1,18 +1,25 @@
-use distancia::{DistanciaMetrica, comp};
+use distancia::DistanciaMetrica;
+
+use crate::vector::DbVector;
 
 mod distancia;
 mod vector;
 
+fn test_vector(dim: usize, seed: f32) -> Vec<f32> {
+    (0..dim).map(|i| i as f32 + seed).collect()
+}
+
 fn main() {
-    let a = vec![1.0_f32, 2.0, 3.0];
-    let b = vec![4.0_f32, 5.0, 6.0];
+    let dim = 384;
+    let mut db = DbVector::new(dim);
 
-    let l2 = comp(&a, &b, DistanciaMetrica::L2).unwrap();
-    println!("L2: {}", l2);
+    for i in 0..10 {
+        db.insertar(test_vector(dim, i as f32)).unwrap();
+    }
 
-    let coseno = comp(&a, &b, DistanciaMetrica::Coseno).unwrap();
-    println!("coseno: {}", coseno);
+    let query = test_vector(dim, 10.0);
 
-    let escalar = comp(&a, &b, DistanciaMetrica::Escalar).unwrap();
-    println!("Producto escalar: {}", escalar);
+    let resultados = db.buscar(&query, 5, DistanciaMetrica::Coseno).unwrap();
+
+    println!("resultadoss: {:?}", resultados);
 }

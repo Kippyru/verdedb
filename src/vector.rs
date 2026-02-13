@@ -7,13 +7,15 @@ pub enum DbError {
 #[derive(Debug)]
 pub struct DbVector {
     dimension: usize,
-    vectores: Vec<Vec<f32>>,
+    len: usize,
+    vectores: Vec<f32>,
 }
 
 impl DbVector {
     pub fn new(dimension: usize) -> Self {
         Self {
             dimension,
+            len: 0,
             vectores: Vec::new(),
         }
     }
@@ -21,8 +23,16 @@ impl DbVector {
         if vector.len() != self.dimension {
             return Err(DbError::DimensionMismatch);
         }
-        self.vectores.push(vector);
-        Ok(self.vectores.len() - 1) //esta vendria ser la id
+        self.vectores.extend_from_slice(&vector);
+        let id = self.len;
+        self.len += 1;
+        Ok(id)
+    }
+
+    fn get_vector(&self, id: usize) -> &[f32] {
+        let start = id * self.dimension;
+        let end = start + self.dimension;
+        &self.vectores[start..end]
     }
 
     pub fn buscar(
@@ -35,9 +45,11 @@ impl DbVector {
             return Err(DbError::DimensionMismatch);
         }
 
-        let mut resultados = Vec::with_capacity(self.vectores.len());
+        let mut resultados = Vec::with_capacity(self.len);
 
-        for (id, vector) in self.vectores.iter().enumerate() {
+        for id in 0..self.len {
+            let vector = self.get_vector(id);
+
             let score = comp(query, vector, metrica).map_err(DbError::DistanciaError)?;
 
             resultados.push((id, score));
